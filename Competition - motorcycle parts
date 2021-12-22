@@ -3,12 +3,24 @@ payType=df.groupby(['payment']).sum()
 #print(payType['total'])
 
 #What is the average unit price for each product line?
-product_line=df.groupby(['product_line']).mean()
-print(product_line)
+product_line=round(df.groupby(['product_line']).mean(),2)
+product_line_total=product_line['total']
+print(product_line_total)
 
 #Create plots to visualize findings for questions 1 and 2.
+# I used this article as a template: https://realpython.com/python-histograms/
+import matplotlib.pyplot as plt
+import numpy as np
 
+# An "interface" to matplotlib.axes.Axes.hist() method
+n, bins, patches = plt.hist(x=product_line_total, bins='auto', color='#0504aa',
+                            alpha=0.7, rwidth=0.85)
+plt.grid(axis='y', alpha=0.75)
+plt.xlabel('Value')
+plt.ylabel('Frequency')
+plt.title('Product Line Total')
 
 #[Optional] Investigate further (e.g., average purchase value by client type, total purchase value by product line, etc.)
+
 
 #Summarize your findings.
