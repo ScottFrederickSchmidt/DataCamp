@@ -1,0 +1,14 @@
+#What are the total sales for each payment method?
+payType=df.groupby(['payment']).sum()
+#print(payType['total'])
+
+#What is the average unit price for each product line?
+product_line=df.groupby(['product_line']).mean()
+print(product_line)
+
+#Create plots to visualize findings for questions 1 and 2.
+
+
+#[Optional] Investigate further (e.g., average purchase value by client type, total purchase value by product line, etc.)
+
+#Summarize your findings.
