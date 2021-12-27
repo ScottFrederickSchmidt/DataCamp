@@ -1,4 +1,8 @@
 '''
+You work for an early-stage startup in Germany. Your team has been working on a redesign of the landing page. The team believes a new design will increase the number of people who click through and join your site. 
+
+They have been testing the changes for a few weeks and now they want to measure the impact of the change and need you to determine if the increase can be due to random chance or if it is statistically significant.
+
 The team assembled the following file:
 
 "treatment" - "yes" if the user saw the new version of the landing page, no otherwise.
@@ -66,7 +70,15 @@ from sklearn.metrics import confusion_matrix, roc_auc_score
 y_pred_proba = model.predict_proba(x_test_data)[::,1]
 
 auc = round( metrics.roc_auc_score(y_test_data, y_pred_proba), 4 ) 
-print("AUC is: ", auc)  # AUC is:  0.5059
+print("Logistic model AUC is: ", auc)  # AUC is:  0.5059
+
+'''
+LOGISTIC REGRESSION SUMMARY:
+With logistic regression using both treatment and new_image columns,
+the AUC was 0.5059. This shows little to no correlation between the new website and attracting new customers.
+'''
+
+
 
 '''
 FINAL SUMMARY:
@@ -79,3 +91,4 @@ AUC is:  0.5059
 
 With a correlation close to 0, this shows that there seems to be no correlation between the two individual columns and becoming a customer.
 '''
+
