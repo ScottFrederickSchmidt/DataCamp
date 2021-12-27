@@ -1,0 +1,48 @@
+import pandas as pd
+df = pd.read_csv('./data/redesign.csv')
+#print(df.head()) #  treatment new_images  converted
+df = df.replace(to_replace = ['yes','no'],value = ['1','0'])
+df=df.dropna()
+#treatmentCorr=(df['treatment'].corr(df['converted']))
+#new_imagesCorr=(df['new_images'].corr(df['converted']))
+
+
+#LOGISTIC REGRESSION:
+from sklearn.model_selection import train_test_split # splitting the data
+from sklearn.linear_model import LogisticRegression # model algorithm
+from sklearn import metrics
+import matplotlib.pyplot as plt
+
+#y = np.asarray(df['converted']) #This will ALWAYS stay the same as the depedent variable column.
+
+#Split the data set into x and y data:
+y_data = df['converted']
+x_data = df.drop('converted', axis = 1)
+
+#split the dataset into training (70%) and testing (30%) sets:
+from sklearn.model_selection import train_test_split
+x_training_data, x_test_data, y_training_data, y_test_data = train_test_split(x_data, y_data, test_size = 0.3, random_state=42)
+#Logistic regression defaults to L2
+
+#Create the model
+from sklearn.linear_model import LogisticRegression
+model = LogisticRegression()
+
+#Train the model and create predictions
+model.fit(x_training_data, y_training_data)
+predictions = model.predict(x_test_data)
+#print(predictions)
+
+#Generate a confusion matrix
+from sklearn.metrics import confusion_matrix, roc_auc_score
+
+#use model to predict probability that given y value is 1:
+y_pred_proba = model.predict_proba(x_test_data)[::,1]
+
+auc = round( metrics.roc_auc_score(y_test_data, y_pred_proba), 4 ) 
+print("AUC is: ", auc)  # AUC is:  0.5059
+
+'''
+With logistic regression using both treatment and new_image columns,
+the AUC was 0.5059. This shows no correlation between the new website.
+'''
