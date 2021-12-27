@@ -1,10 +1,37 @@
+'''
+The team assembled the following file:
+
+"treatment" - "yes" if the user saw the new version of the landing page, no otherwise.
+"new_images" - "yes" if the page used a new set of images, no otherwise.
+"converted" - 1 if the user joined the site, 0 otherwise.
+The control group is those users with "no" in both columns: the old version with the old set of images.
+'''
+
 import pandas as pd
 df = pd.read_csv('./data/redesign.csv')
 #print(df.head()) #  treatment new_images  converted
-df = df.replace(to_replace = ['yes','no'],value = ['1','0'])
+#print(type(df)) #<class 'pandas.core.frame.DataFrame'>
+df = df.replace(to_replace = ['yes','no'],value = [1,0])
 df=df.dropna()
-#treatmentCorr=(df['treatment'].corr(df['converted']))
-#new_imagesCorr=(df['new_images'].corr(df['converted']))
+
+'''
+What is the correlation of the treatment and new_images individually?
+Maybe one column is effective while the other is not?
+The following code will find out:
+'''
+
+treatmentCorr=df['treatment'].corr(df['converted'])
+new_imagesCorr=(df['new_images'].corr(df['converted']))
+print(round(treatmentCorr, 4) , " is the treatment correlation.")
+print(round(new_imagesCorr, 4) , " is the new images correlation.")
+
+'''
+Correlation Summary:
+0.0111  is the treatment correlation.
+-0.0007  is the new images correlation.
+
+With a correlation close to 0, this shows that there seems to be no correlation between the two individual columns and becoming a customer.
+'''
 
 
 #LOGISTIC REGRESSION:
@@ -13,10 +40,9 @@ from sklearn.linear_model import LogisticRegression # model algorithm
 from sklearn import metrics
 import matplotlib.pyplot as plt
 
-#y = np.asarray(df['converted']) #This will ALWAYS stay the same as the depedent variable column.
-
 #Split the data set into x and y data:
 y_data = df['converted']
+#x_data = df['new_images']
 x_data = df.drop('converted', axis = 1)
 
 #split the dataset into training (70%) and testing (30%) sets:
@@ -43,6 +69,13 @@ auc = round( metrics.roc_auc_score(y_test_data, y_pred_proba), 4 )
 print("AUC is: ", auc)  # AUC is:  0.5059
 
 '''
+FINAL SUMMARY:
 With logistic regression using both treatment and new_image columns,
 the AUC was 0.5059. This shows no correlation between the new website.
+
+0.0111  is the treatment correlation.
+-0.0007  is the new images correlation.
+AUC is:  0.5059
+
+With a correlation close to 0, this shows that there seems to be no correlation between the two individual columns and becoming a customer.
 '''
