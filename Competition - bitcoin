@@ -1,0 +1,69 @@
+'''
+Should your fund invest in Bitcoin?
+📖 Background
+You work as an analyst at an investment fund in New York. Your CFO wants to explore if it is a good idea to invest some of the fund's assets in Bitcoin. You have to prepare a report on this asset and how it compares to the stock market in general.
+
+💾 The data
+You have access to three files:
+
+Bitcoin daily data in US dollars
+"date" - date from September 17, 2014 to November 17, 2021
+"open" - the price at the beginning of the trading day
+"high" - the highest price reached that day
+"low" - the lowest price reached that day
+"close" - the price at the closing of the trading day
+"volume" - how many Bitcoin were traded that day
+S&P 500 daily data
+"date" - date from September 17, 2014 to November 17, 2021
+"open" - the index level at the beginning of the trading day
+"high" - the highest level reached that day
+"low" - the lowest level reached that day
+"close" - the level at the closing of the trading day
+"volume" - how many shares in the companies that make up the index were traded that day
+inflation and gold as monthly data
+"date" - date from September, 2014 to November, 2021
+"gold_usd" - price in usd of gold for that month
+"cpi_us" - the inflation index for the US for that month (cpi = consumer price index)
+CPI data from the U.S. Bureau of Labor Statistics. Publicly available information.
+'''
+
+import pandas as pd
+
+#BITCOIN DATA MANIPULATION:
+btcDF = pd.read_csv('./data/bitcoin-usd.csv', parse_dates=['date']).filter(['date', 'close']).rename(columns={'close':'Bitcoin'}, inplace=False)
+btcDF['date'] = btcDF['date'].astype(str) #must change date to str see above reference
+btcDF['day'] = btcDF['date'].str[-2:] #last two digits are the day
+btcDF=btcDF.loc[btcDF['day'].str.contains('01')].reset_index(drop=True)
+btcDF['date'] = btcDF['date'].apply(pd.to_datetime) #change date back to date type before a JOIN merge
+
+#SP500 Data Manipulation:
+spyDF = pd.read_csv('./data/sp500.csv', parse_dates=['date']).filter(['date', 'close']).rename(columns={'close': 'SP500'}, inplace=False)
+spyDF['date'] = spyDF['date'].astype(str) #must change date to str see above reference
+spyDF['day'] = spyDF['date'].str[-2:] #last two digits are the day
+spyDF=spyDF.loc[spyDF['day'].str.contains('01')].reset_index(drop=True)
+spyDF['date'] = spyDF['date'].apply(pd.to_datetime) #change date back to date type before a JOIN merge
+
+# CPI/GOLD DATA:
+monthlyDF = pd.read_csv('./data/monthly_data.csv', parse_dates=['date'])
+head=monthlyDF.head()  #date  gold_usd   cpi_us
+
+#MERGE THE THREE DATAFRAMES:
+joinDF = pd.merge(btcDF, monthlyDF, on='date', how='outer').reset_index(drop=True)
+finalDF = pd.merge(joinDF, spyDF, on='date', how='outer').reset_index(drop=True)
+finalDF = finalDF.dropna() 
+finalDF= finalDF.drop(['day_x', 'day_y'], axis=1, inplace=False).reset_index(drop=True)
+head=finalDF.head() # date  btc  gold_usd   cpi_us SP500
+
+#PLOT DATA:
+import matplotlib.pyplot as plt
+finalDF.plot(x='date', y=['Bitcoin', 'gold_usd', 'SP500', 'cpi_us'], title="Bitcoin Analysis")
+
+'''
+SUMMARY:
+It has been said that Bitcoin does well in inflation which seems to be the case.
+However, bitcoin has many unknown predictors. Risky assets in general have done well
+during COVID19 due to low interest rates and quantitative easing.
+Since 2014, Bitcoin has increased in value by over 10,000%. 
+Therefore, the graph is difficult to analyze because of the massive jump during the 
+bull run starting around 2020.
+'''
