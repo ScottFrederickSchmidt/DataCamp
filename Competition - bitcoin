@@ -1,5 +1,4 @@
 '''
-Should your fund invest in Bitcoin?
 📖 Background
 You work as an analyst at an investment fund in New York. Your CFO wants to explore if it is a good idea to invest some of the fund's assets in Bitcoin. 
 You have to prepare a report on this asset and how it compares to the stock market in general.
@@ -22,6 +21,7 @@ S&P 500 daily data
 "low" - the lowest level reached that day
 "close" - the level at the closing of the trading day
 "volume" - how many shares in the companies that make up the index were traded that day
+
 inflation and gold as monthly data
 "date" - date from September, 2014 to November, 2021
 "gold_usd" - price in usd of gold for that month
