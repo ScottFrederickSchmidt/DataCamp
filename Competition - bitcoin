@@ -29,7 +29,6 @@ inflation and gold as monthly data
 CPI data from the U.S. Bureau of Labor Statistics. Publicly available information:
 https://www.bls.gov/cpi/
 '''
-
 import pandas as pd
 
 #BITCOIN DATA MANIPULATION:
@@ -39,14 +38,14 @@ btcDF['day'] = btcDF['date'].str[-2:] #last two digits are the day
 btcDF=btcDF.loc[btcDF['day'].str.contains('01')].reset_index(drop=True)
 btcDF['date'] = btcDF['date'].apply(pd.to_datetime) #change date back to date type before a JOIN merge
 
-#SP500 Data Manipulation:
+#SP500 DATA MANIPULATION:
 spyDF = pd.read_csv('./data/sp500.csv', parse_dates=['date']).filter(['date', 'close']).rename(columns={'close': 'SP500'}, inplace=False)
 spyDF['date'] = spyDF['date'].astype(str) #must change date to str see above reference
 spyDF['day'] = spyDF['date'].str[-2:] #last two digits are the day
 spyDF=spyDF.loc[spyDF['day'].str.contains('01')].reset_index(drop=True)
 spyDF['date'] = spyDF['date'].apply(pd.to_datetime) #change date back to date type before a JOIN merge
 
-# CPI/GOLD DATA:
+# CPI/GOLD DATA MANIPULATION:
 monthlyDF = pd.read_csv('./data/monthly_data.csv', parse_dates=['date'])
 head=monthlyDF.head()  #date  gold_usd   cpi_us
 
