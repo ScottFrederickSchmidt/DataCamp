@@ -1,0 +1,64 @@
+import pandas as pd
+import numpy as np
+import datetime
+import matplotlib.pyplot as plt
+
+accidents = pd.read_csv(r'./data/accident-data.csv')
+aDF = pd.DataFrame(accidents).dropna()
+#aDF=aDF.dropna() #there was no empty data
+#print(df.columns)
+'''
+Index(['accident_index', 'accident_year', 'accident_reference', 'longitude',
+       'latitude', 'accident_severity', 'number_of_vehicles',
+       'number_of_casualties', 'date', 'day_of_week', 'time',
+       'first_road_class', 'first_road_number', 'road_type', 'speed_limit',
+       'junction_detail', 'junction_control', 'second_road_class',
+       'second_road_number', 'pedestrian_crossing_human_control',
+       'pedestrian_crossing_physical_facilities', 'light_conditions',
+       'weather_conditions', 'road_surface_conditions',
+       'special_conditions_at_site', 'carriageway_hazards',
+       'urban_or_rural_area'],
+      dtype='object')
+'''
+
+'''
+What time of day and day of the week do most major incidents happen?
+What time of day and day of the week do most major incidents happen?
+Are there any patterns in the time of day/ day of the week when major incidents occur?
+What characteristics stand out in major incidents compared with other accidents?
+'''
+#DATE TIME DATAFRAME:
+timeDF=aDF.filter(["accident_index", "number_of_casualties", "date", "day_of_week", "time"])
+timeDF=timeDF[timeDF['number_of_casualties']>2].reset_index(drop=True)
+
+nums=[]
+weekday=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+print("Calculating accident count day of week: ")
+for i in range(1, 8):
+    day = timeDF[timeDF['day_of_week'] == i]
+    count=day['day_of_week'].count()
+    nums.append(count)
+    #print(count, " on ", weekday[i-1]) 
+#print("Done counting accident count in day of week.")
+
+plt.plot(weekday, nums)
+plt.xlabel('weekday')
+plt.ylabel('number accidents')
+plt.title('Number Accidents per Weekday')
+plt.show()
+
+'''
+Calculating accident count day of week: 
+687  on  Monday
+614  on  Tuesday
+621  on  Wednesday
+632  on  Thursday
+645  on  Friday
+798  on  Saturday
+820  on  Sunday
+Done counting accident count in day of week.
+'''
+
+'''
+On what areas would you recommend the planning team focus their brainstorming efforts to reduce major incidents?
+'''
