@@ -1,6 +1,4 @@
 '''
-Create a report that covers the following:
-
 How does the performance of Bitcoin compare to the S&P 500 and the price of gold?
 Analyze Bitcoin's returns and volatility profile. Do you believe it could help improve the performance of a portfolio? 
 Do you believe Bitcoin could be used as a hedge versus inflation?
@@ -13,26 +11,17 @@ You have to prepare a report on this asset and how it compares to the stock mark
 💾 The data
 You have access to three files:
 
-Bitcoin daily data in US dollars
+Bitcoin daily data in US dollars:
 "date" - date from September 17, 2014 to November 17, 2021
-"open" - the price at the beginning of the trading day
-"high" - the highest price reached that day
-"low" - the lowest price reached that day
 "close" - the price at the closing of the trading day
 "volume" - how many Bitcoin were traded that day
 
-S&P 500 daily data
+S&P 500 daily data:
 "date" - date from September 17, 2014 to November 17, 2021
 "open" - the index level at the beginning of the trading day
-"high" - the highest level reached that day
-"low" - the lowest level reached that day
 "close" - the level at the closing of the trading day
-"volume" - how many shares in the companies that make up the index were traded that day
 
-inflation and gold as monthly data
-"date" - date from September, 2014 to November, 2021
-"gold_usd" - price in usd of gold for that month
-"cpi_us" - the inflation index for the US for that month (cpi = consumer price index)
+Inflation and gold as monthly data:
 CPI data from the U.S. Bureau of Labor Statistics. Publicly available information:
 https://www.bls.gov/cpi/
 '''
