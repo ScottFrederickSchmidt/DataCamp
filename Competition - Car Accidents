@@ -11,8 +11,7 @@ import datetime
 import matplotlib.pyplot as plt
 
 accidents = pd.read_csv(r'./data/accident-data.csv')
-aDF = pd.DataFrame(accidents).dropna()
-#aDF=aDF.dropna() #there was no empty data
+aDF = pd.DataFrame(accidents).dropna() #there was no empty data=
 #print(df.columns)
 '''
 Index(['accident_index', 'accident_year', 'accident_reference', 'longitude',
