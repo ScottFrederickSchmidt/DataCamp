@@ -1,3 +1,10 @@
+'''
+What time of day and day of the week do most major incidents happen?
+What time of day and day of the week do most major incidents happen?
+Are there any patterns in the time of day/ day of the week when major incidents occur?
+What characteristics stand out in major incidents compared with other accidents?
+'''
+
 import pandas as pd
 import numpy as np
 import datetime
@@ -21,12 +28,6 @@ Index(['accident_index', 'accident_year', 'accident_reference', 'longitude',
       dtype='object')
 '''
 
-'''
-What time of day and day of the week do most major incidents happen?
-What time of day and day of the week do most major incidents happen?
-Are there any patterns in the time of day/ day of the week when major incidents occur?
-What characteristics stand out in major incidents compared with other accidents?
-'''
 #DATE TIME DATAFRAME:
 timeDF=aDF.filter(["accident_index", "number_of_casualties", "date", "day_of_week", "time"])
 timeDF=timeDF[timeDF['number_of_casualties']>2].reset_index(drop=True)
