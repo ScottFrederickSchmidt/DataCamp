@@ -2,7 +2,8 @@
 Create a report that covers the following:
 
 How does the performance of Bitcoin compare to the S&P 500 and the price of gold?
-Analyze Bitcoin's returns and volatility profile. Do you believe it could help improve the performance of a portfolio? Do you believe Bitcoin could be used as a hedge versus inflation?
+Analyze Bitcoin's returns and volatility profile. Do you believe it could help improve the performance of a portfolio? 
+Do you believe Bitcoin could be used as a hedge versus inflation?
 The CFO is looking to lower volatility in the fund. Explore building a portfolio using some or all of these assets. Make a recommendation that minimizes overall risk.
 
 📖 Background
@@ -68,10 +69,15 @@ finalDF.plot(x='date', y=['Bitcoin', 'gold_usd', 'SP500', 'cpi_us'], title="Bitc
 
 '''
 SUMMARY:
+Ray Dalio, the world's largest hedge fund manager recommends owning some bitcoin.
+The downfall of bitcoin is volatility. If bitcoin can stablize more investment firms will buy into Bitcoin 
+as it will become a more stable "currency". 
+
 It has been said that Bitcoin does well in inflation which seems to be the case.
 However, bitcoin has many unknown predictors. Risky assets in general have done well
 during COVID19 due to low interest rates and quantitative easing.
+With all the money printing, it makes sense to hold a 1% or 2% as a hedge versus inflation.
 Since 2014, Bitcoin has increased in value by over 10,000%. 
 Therefore, the graph is difficult to analyze because of the massive jump during the 
-bull run starting around 2020.
+bull run starting around 2020. 
 '''
