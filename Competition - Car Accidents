@@ -61,3 +61,24 @@ Done counting accident count in day of week.
 '''
 On what areas would you recommend the planning team focus their brainstorming efforts to reduce major incidents?
 '''
+
+from datetime import datetime
+
+hours=list(timeDF['time'].astype(str).str[:2])
+hoursDic={} #store into dictionary with hours by key and number accidents as values
+
+for i in range(0,10):
+    count=hours.count('0'+str(i))
+    hoursDic[i]=count
+for i in range(10,24):
+    count=hours.count(str(i))
+    hoursDic[i]=count
+    
+print(hoursDic)
+
+plt.bar(hoursDic.keys(),hoursDic.values())
+plt.title('Accidents on an Hourly Basis')
+plt.xlabel('Time of Accident by Hour')
+plt.ylabel('Number Accidents')
+plt.show()
+
