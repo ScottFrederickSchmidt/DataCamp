@@ -83,7 +83,38 @@ plt.ylabel('Number Accidents')
 plt.show()
 
 
-#LocDF will attempt to find if any locations have consistent accidents.
+'''
+#LocDF will locate the most common places for accidents.
+'''
+
 locDF=aDF.filter(['longitude', 'latitude']).round(2)
 locDF = locDF.applymap(str) #need to combine two numbers in next step
 locDF['Loc']=locDF['longitude']+ locDF['latitude'] #combines two dataframes as str. Now, count to see if same number populates.
+loc=sorted(list(locDF['Loc']))
+
+from collections import Counter
+count=Counter(loc) #counts how many in a given list
+topTen=count.most_common(10) #only need the top ones
+
+print("Top ten most dangerous locations: ")
+print("Lat  " , " Long ", " Count ")
+for t in topTen:
+    lat=t[0][:6]
+    long=t[0][6:]
+    count=t[1]
+    print(lat, " ", long, "  ", count)
+    
+'''
+Top ten most dangerous locations: 
+Lat    Long   Count 
+-0.165   1.52    91
+-0.135   1.43    75
+-0.151   .5    74
+-0.175   1.52    71
+-0.135   1.51    70
+-0.145   1.54    70
+-0.065   1.51    65
+-0.075   1.52    64
+-0.145   1.52    64
+-0.075   1.58    62
+'''
