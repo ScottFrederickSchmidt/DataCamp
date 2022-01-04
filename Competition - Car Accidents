@@ -82,3 +82,8 @@ plt.xlabel('Time of Accident by Hour')
 plt.ylabel('Number Accidents')
 plt.show()
 
+
+#LocDF will attempt to find if any locations have consistent accidents.
+locDF=aDF.filter(['longitude', 'latitude']).round(2)
+locDF = locDF.applymap(str) #need to combine two numbers in next step
+locDF['Loc']=locDF['longitude']+ locDF['latitude'] #combines two dataframes as str. Now, count to see if same number populates.
