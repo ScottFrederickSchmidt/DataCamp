@@ -1,0 +1,7 @@
+import pandas as pd
+df = pd.read_csv(r'./data/russian_alcohol_consumption.csv')
+df = pd.DataFrame(df).dropna() # reduced from 1615 to 1549 columns
+#rdf=df.groupby(['year'])
+#df.groupby("a").sample(n=1, random_state=1)\
+test=df.groupby(["region", "year"]).sample(n=1, random_state=1)
+print(test)
