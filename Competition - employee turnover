@@ -1,0 +1,34 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+from sklearn.decomposition import PCA
+from sklearn.linear_model import LogisticRegression
+
+df = pd.read_csv('./data/employee_churn_data.csv') # (9540, 10)
+#These columns are numeric:
+cols=['promoted', 'review', 'projects', 'tenure', 
+'satisfaction','bonus','avg_hrs_month']
+
+y=df['left'].replace({'no': 0, 'yes': 1}).astype(int)
+#print(y)
+
+df1=df.filter(cols).dropna()  #[9540 rows x 7 columns] #no missing values
+
+d={} #probabilty dictionary
+for c in cols:
+    p=y.corr(df[c]).round(2)
+    d[c]=p  #store col with probability into dictionary
+    
+dSort=sorted(((v, k) for k, v in d.items()), reverse=True)
+for d in dSort:
+    print(d)
+'''
+(0.3, 'review')
+(0.01, 'tenure')
+(0.01, 'avg_hrs_month')
+(-0.01, 'satisfaction')
+(-0.01, 'projects')
+(-0.01, 'bonus')
+(-0.04, 'promoted')
+'''
