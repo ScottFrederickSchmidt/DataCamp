@@ -1,9 +1,14 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
+
+'''
+Data Manipulation:
+'''
 
 df = pd.read_csv('./data/employee_churn_data.csv') # (9540, 10)
 #These columns are numeric:
@@ -11,24 +16,84 @@ cols=['promoted', 'review', 'projects', 'tenure',
 'satisfaction','bonus','avg_hrs_month']
 
 y=df['left'].replace({'no': 0, 'yes': 1}).astype(int)
-#print(y)
-
 df1=df.filter(cols).dropna()  #[9540 rows x 7 columns] #no missing values
 
-d={} #probabilty dictionary
-for c in cols:
-    p=y.corr(df[c]).round(2)
-    d[c]=p  #store col with probability into dictionary
-    
-dSort=sorted(((v, k) for k, v in d.items()), reverse=True)
-for d in dSort:
-    print(d)
+Var_Corr = df.corr()
+# plot the heatmap and annotation on it
+sns.heatmap(Var_Corr, xticklabels=Var_Corr.columns, yticklabels=Var_Corr.columns, annot=True)
+
 '''
-(0.3, 'review')
-(0.01, 'tenure')
-(0.01, 'avg_hrs_month')
+Are the different correlations correlated? 
+1)Normal correlation using .corr in Python. 
+2)Pearson's correlation assesses linear relationships between two continuous variables.
+3)Correlationn coefficient represents the linear dependence of two variables or sets of data.
+'''
+
+dCor={} #correlation dictionary
+dPear={} #pearson dictionary 
+dCov={} #covariance correlation dictionary
+dKend={} #Kendalltau correlation dictionary
+
+for col in cols:
+    #Correlation:
+    x=df[col]
+    cor=y.corr(x).round(3)
+    dCor[col]=cor
+    
+    #pearson correlation:
+    pear=np.corrcoef(list(x), list(y))[0, 1].round(3)
+    dPear[col]=pear
+    
+    #covariance correlation
+    cov=np.cov(x,y)[0][1].round(3)
+    dCov[col]=cov
+    
+    #kendall correlation:
+
+    
+dCor=sorted(((v, k) for k, v in dCor.items()), reverse=True)
+dPear=sorted(((v, k) for k, v in dPear.items()), reverse=True)
+dCov=sorted(((v, k) for k, v in dCov.items()), reverse=True)
+
+print("Calculating Correlations:")
+for d in dCor:
+    print(d)
+print("")
+
+print("Calculate Pearson Correlation:")
+for p in dPear:
+    print(p)
+print("")
+
+print("Covariance correlation:")
+for c in dCov:
+    print(c)
+    
+'''
+Calculating Correlations:
+(0.304, 'review')
+(0.011, 'tenure')
+(0.009, 'avg_hrs_month')
 (-0.01, 'satisfaction')
-(-0.01, 'projects')
-(-0.01, 'bonus')
-(-0.04, 'promoted')
+(-0.011, 'bonus')
+(-0.012, 'projects')
+(-0.037, 'promoted')
+
+Calculate Pearson Correlation:
+(0.304, 'review')
+(0.011, 'tenure')
+(0.009, 'avg_hrs_month')
+(-0.01, 'satisfaction')
+(-0.011, 'bonus')
+(-0.012, 'projects')
+(-0.037, 'promoted')
+
+Covariance correlation:
+(0.017, 'avg_hrs_month')
+(0.012, 'review')
+(0.007, 'tenure')
+(-0.001, 'satisfaction')
+(-0.002, 'bonus')
+(-0.003, 'promoted')
+(-0.003, 'projects')
 '''
