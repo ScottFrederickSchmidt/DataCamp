@@ -118,3 +118,37 @@ Lat    Long   Count
 -0.145   1.52    64
 -0.075   1.58    62
 '''
+
+ldata = pd.read_csv(r'./data/road-safety-lookups.csv')
+#print(lDF.head()) # table field name code/format label
+
+# Total missing values for each feature
+def checkNA():
+	lDF.isnull().sum() 
+'''
+table            0
+field name       0
+code/format      8
+label           10
+note           119
+'''
+
+print("Here are the top ten accident types: ")
+lDF = pd.DataFrame(data=ldata, columns=['table', 'field name'])
+lcount=lDF.groupby(by=['field name']).count().sort_values(by='table', ascending=False).head(10)
+print(lcount)
+'''
+Here are the top ten accident types: 
+                                         table
+field name                                    
+junction_detail                             11
+weather_conditions                          10
+carriageway_hazards                         10
+special_conditions_at_site                  10
+road_surface_conditions                      9
+road_type                                    8
+pedestrian_crossing_physical_facilities      8
+day_of_week                                  7
+junction_control                             7
+second_road_class                            7
+'''
