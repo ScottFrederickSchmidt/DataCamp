@@ -1,0 +1,412 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "prostate-arizona",
+   "metadata": {
+    "id": "bA5ajAmk7XH6"
+   },
+   "source": [
+    "# Reducing the number of high fatality accidents\n",
+    "\n",
+    "## 📖 Background\n",
+    "You work for the road safety team within the department of transport and are looking into how they can reduce the number of major incidents. The safety team classes major incidents as fatal accidents involving 3+ casualties. They are trying to learn more about the characteristics of these major incidents so they can brainstorm interventions that could lower the number of deaths. They have asked for your assistance with answering a number of questions."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "suspected-substitute",
+   "metadata": {
+    "id": "TAezigD_8u-1"
+   },
+   "source": [
+    "## 💾 The data\n",
+    "The reporting department have been collecting data on every accident that is reported. They've included this along with a lookup file for 2020's accidents.\n",
+    "\n",
+    "*Published by the department for transport. https://data.gov.uk/dataset/road-accidents-safety-data* \n",
+    "*Contains public sector information licensed under the Open Government Licence v3.0.*"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "uniform-isolation",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Calculating accident count day of week: \n"
+     ]
+    },
+    {
+     "data": {
+      "image/png": "iVBORw0KGgoAAAANSUhEUgAAAYUAAAEWCAYAAACJ0YulAAAAOXRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjMuNCwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy8QVMy6AAAACXBIWXMAAAsTAAALEwEAmpwYAAAneElEQVR4nO3de7wVdb3/8ddbwPsF0R0RgphSZlok+xhmmUp6vBUeU8tTCnih+llZlmWdSistrYw0y0It8VLeSiXvHhTxroCoeDuiooAoqFy8pIZ9fn98v2sxLPZlbdhrrQ37/Xw81mPPfOf2mVlrz2fmOzPfUURgZmYGsFajAzAzs67DScHMzMqcFMzMrMxJwczMypwUzMyszEnBzMzKnBSs00g6X9LJjY6jIyRdL2lkK8MGSQpJPesd15oob8ttqhx3kqSjah2TrchJYQ0maZak+ZI2KJQdJWlSA8NaZTn5LJXUb1XnFRH7RMT4zoirLV11Jyfpe5Kuryh7spWyz9c3OmsEJ4U1Xw/g2EYH0VGSerRSvgHwWWAx8MW6BrWaU1L5Pz8Z+Fhpe+dE2wv4SEXZNnlcW8M5Kaz5fgl8W1LvygEtVY8Uj2gljZJ0p6SxkhZJelrSx3L57HwWUln1srmkmyW9Kuk2SVsW5r1tHvaKpCckHVIYdr6ksyVdJ+l1YPdW1uezwCLgJ8Byy5bUR9KfJT0vaaGkqwrDRkiaLmmJpKck7d3C+vaQ9CtJL0l6GtivYv6bSDpP0jxJcyWdXNhxjpJ0R55+oaRnJO2Th50CfAI4S9Jrks7KO+ixeRsukfSwpO1bWuEc488l3ZfHvVpSn8LwYZLuyt/Rg5J2q5j2FEl3Am8A762Y/f2kJDAk938CuBV4oqLsqYh4vq1tkJd3hKTH8ja4sfj9V6zTx/NvaLfcv6ekxyUtlnQWoMK4W0u6RdLL+bu5uPR7lnS8pL9VzPtMSWe0tFyrQkT4s4Z+gFnAp4C/AyfnsqOASbl7EBBAz8I0k4CjcvcoYCkwmnTGcTLwHPA7YB1gL+BVYMM8/vm5f9c8/AzgjjxsA2B2nldP4CPAS8B2hWkXA7uQDlbWbWWdJgK/APrm2IYWhl0LXApsStrRfTKX75TnvWeed39g2xbW98vA48AAoA9p51jePsCVwB/zurwLuA/4UmFb/Qs4Om+rrwDPA6pcTu7/T2Aq0Ju0A/wA0K+VdZ4EzAW2z8v+G3BRHtYfeBnYN6/bnrm/qTDtc8AH83bv1cL8bwW+mbvPAo4ATqko+1MV22AEMDOvS0/gB8BdheUE6Yxj7/xb2CmXb0763RyUv7dv5u+29L1sk9drHaCJdMbymzysH/A60Dv39wTmU/hd+NPB/UajA/Cnhl/usqSwfd4pNtHxpPBkYdgOefy+hbKXgSG5+3zgksKwDYF3SDvZzwG3V8T3R+DEwrQXtLM+A4F/F5Z3I3BG7u6Xh23awnR/BMa2Ms/i+t4CfLkwbK/S9iElobeA9QrDDwVuLWyrmYVh6+dp3125nNy/B/B/wDBgrXbWexJwaqF/O+BtUvL5LnBhxfg3AiML0/6knfmfBFyZux8EBpN23MWykVVsg+uBIwvD1iKdnWyZ+wP4HvAssH1hvMOBewr9AuYUt1dFvAcADxT6rweOzt37A482+n9vdf64+qgbiIgZwDXACSsx+YuF7n/m+VWWbVjon11Y7mvAK8B7gC2Bj+YqjkWSFgFfAN7d0rStOAx4LCKm5/6Lgf+W1IuUeF6JiIUtTDcAeKqdeZPjLMbwbKF7S9JR7LxC/H8kHS2XvFDqiIg3cmdx21AYfgvpCPx3wHxJ4yRt3EZslXH1Ih1hbwkcXLFdP05Kki1N25LJwMdzlVRTRDwJ3EW61tCHdFAxmfa3wZbAGYVhr5B28P0Ly/oGcFn+TZYst90j7d3L/ZL6SrokV1ctAS7K614ynmXXl74IXNjO+lobfKtd93EiMA04vVD2ev67PrAkdxd30itjQKlD0oakapjnSf/kt0XEnm1M216TvYcDAyWVdr49gc1IVSf3AX0k9Y6IRRXTzQa2riL2ecX4SWcmxXm8BWweEUurmFelFdYtIs4EzpT0LuAy4Hjgh61MXxnXv0jVb7NJZwpHd2TZFe4GNiFVfd2ZY1si6flc9nxEPCPpTdreBrOBUyLi4jaWdTBwnqQ5EVGq919uu0sSy6/vz/I67BARr0g6gJRQS64Czs7XZPYHvtPO+lobfKbQTUTETFJ9+9cLZQtIddVfzBdZj6C6nWdb9s0XEdcGfkqqFphNOlN5n6TDJPXKn/+Q9IFqZipp5xzbTqQLoENIR7B/AQ6PiHmkaoTfS9o0z3/XPPl5wGhJwyWtJam/pG1bWMxlwNclbSFpUwpnVnn+NwGnS9o4z2drSZ+scru8SOEib173j+aznNeBN0nVX635oqTtJK1Push+RUS8Qzpq/rSk/8zf4bqSdpO0RZVxERH/BKYAxwG3Fwbdkcsm5/Ha2wZ/AL4n6YN5HTeRdHDF4p4HhgPHSvpKLrsW+KCkA5Vuevg6yx+cbAS8BiyW1J+UPIvxvwlcQfot3BcRz1W77rYiJ4Xu5SekC4RFR5P+yV4mXYy8axWX8RfSWckrwFDyaX1EvEqqo/88acfwAnAa6eJhNUYCV0fEwxHxQulDupi9f67mOIx0BP046WLjN/Ky7yNd4B5LurZyG6mqo9I5pPr4B0lnVX+vGH44sDbwKLCQtCOq9lmJM4CD8l05ZwIb5+UtJFUHvUy6U6w1F5Kuu7wArEtO7jnhjgC+DywgHa0fT8f/t28jVQPdUSi7PZcVb0VtdRtExJWk7/SSXM0zA9inckF5pz0cOEHSURHxEukM4lTSdhhMPmPJfgzsSPrurmXF7wVSFdIOuOpolZXujDCzLkrpYcOLIuLcRsfSVUkaSDoYeHdELGlvfGudzxTMbLWm9EDecaQ735wQVpEvNJvZakvpCfcXSVVwezc4nDWCq4/MzKzM1UdmZla2Wlcfbb755jFo0KBGh2FmtlqZOnXqSxHR1NKw1TopDBo0iClTpjQ6DDOz1YqkZ1sb5uojMzMrc1IwM7MyJwUzMytzUjAzszInBTMzK3NSMDOzMicFMzMrc1IwM7MyJwUzMytbrZ9oNjOrl0EnXNvoEJYz69T9ajJfnymYmVlZTZOCpG9KekTSDEl/ze+P3UrSvZJmSro0v8sXSevk/pl5+KBaxmZmZiuqWVLIL9j+OtAcEdsDPUjv5z0NGBsR25De8XpknuRIYGEuH5vHMzOzOqp19VFPYD1JPYH1gXnAHqSXfUN62fYBuXtE7icPHy5JNY7PzMwKanahOSLmSvoV8BzwT+AmYCqwKCKW5tHmAP1zd39gdp52qaTFwGbAS8X5ShoDjAEYOHBgrcI3sxrqLhdtV0e1rD7alHT0vxXwHmADOuEdqhExLiKaI6K5qanFd0SYmdlKqmX10aeAZyJiQUT8C/g7sAvQO1cnAWwBzM3dc4EBAHn4JsDLNYzPzMwq1DIpPAcMk7R+vjYwHHgUuBU4KI8zErg6d0/I/eTht0RE1DA+MzOrULOkEBH3ki4YTwMezssaB3wXOE7STNI1g/PyJOcBm+Xy44ATahWbmZm1rKZPNEfEicCJFcVPAzu1MO6bwMG1jMfMzNrmJ5rNzKzMScHMzMqcFMzMrMxJwczMypwUzMyszEnBzMzKnBTMzKzMScHMzMqcFMzMrMxJwczMypwUzMyszEnBzMzKnBTMzKzMScHMzMqcFMzMrMxJwczMymqWFCS9X9L0wmeJpG9I6iPpZklP5r+b5vEl6UxJMyU9JGnHWsVmZmYtq+XrOJ+IiCERMQQYCrwBXEl6zebEiBgMTGTZazf3AQbnzxjg7FrFZmZmLatX9dFw4KmIeBYYAYzP5eOBA3L3COCCSO4BekvqV6f4zMyM+iWFzwN/zd19I2Je7n4B6Ju7+wOzC9PMyWXLkTRG0hRJUxYsWFCreM3MuqWaJwVJawOfAS6vHBYRAURH5hcR4yKiOSKam5qaOilKMzOD+pwp7ANMi4gXc/+LpWqh/Hd+Lp8LDChMt0UuMzOzOulZh2UcyrKqI4AJwEjg1Pz36kL5VyVdAnwUWFyoZup0g064tlazXimzTt2v0SGYmdU2KUjaANgT+FKh+FTgMklHAs8Ch+Ty64B9gZmkO5VG1zI2MzNbUU2TQkS8DmxWUfYy6W6kynEDOKaW8ZiZWdv8RLOZmZU5KZiZWZmTgpmZlTkpmJlZmZOCmZmVOSmYmVmZk4KZmZU5KZiZWVk9mrkwsxpyky3WmXymYGZmZU4KZmZW5uojswpdqTrGVTFWbz5TMDOzMicFMzMrc/WR1VRXqooBV8eYtcdnCmZmVlbrN6/1Bs4FtgcCOAJ4ArgUGATMAg6JiIWSBJxBevvaG8CoiJhWy/hWNz7qNrNaq/WZwhnADRGxLfBh4DHgBGBiRAwGJuZ+gH2AwfkzBji7xrGZmVmFDiUFSZtK+lCV424C7AqcBxARb0fEImAEMD6PNh44IHePAC6I5B6gt6R+HYnPzMxWTbtJQdIkSRtL6gNMA86R9Osq5r0VsAD4s6QHJJ0raQOgb0TMy+O8APTN3f2B2YXp5+SyynjGSJoiacqCBQuqCMPMzKpVzZnCJhGxBDiQdCT/UeBTVUzXE9gRODsiPgK8zrKqIgAiIkjXGqoWEeMiojkimpuamjoyqZmZtaOapNAzV+McAlzTgXnPAeZExL25/wpSknixVC2U/87Pw+cCAwrTb5HLzMysTqpJCj8GbgRmRsT9kt4LPNneRBHxAjBb0vtz0XDgUWACMDKXjQSuzt0TgMOVDAMWF6qZzMysDqq5JXVeRJQvLkfE01VeUwD4GnCxpLWBp4HRpER0maQjgWdJZyAA15FuR51JuiV1dJXLMDOzTlJNUvgtqdqnvbIVRMR0oLmFQcNbGDeAY6qIx8zMaqTVpCBpZ+BjQJOk4wqDNgZ61DowMzOrv7bOFNYGNszjbFQoXwIcVMugzMysMVpNChFxG3CbpPMj4tk6xmRmZg1SzTWFdSSNI7VVVB4/IvaoVVBmZtYY1SSFy4E/kBq2e6e24ZiZWSNVkxSWRoQbpzMz6waqeXjtH5L+n6R+kvqUPjWPzMzM6q6aM4XS08fHF8oCeG/nh2NmZo3UblKIiK3qEYiZmTVeNU1nry/pB/kOJCQNlrR/7UMzM7N6q+aawp+Bt0lPN0NqufTkmkVkZmYNU01S2DoifgH8CyAi3gBU06jMzKwhqkkKb0taj/wyHElbA2/VNCozM2uIau4+OhG4ARgg6WJgF2BULYMyM7PGqObuo5slTQOGkaqNjo2Il2oemZmZ1V1bTWdXvi+h9Ba0gZIGRsS02oVlZmaN0NaZwun577qkF+U8SDpT+BAwBdi5vZlLmgW8SmozaWlENOenoS8lNbA3CzgkIhZKEnAG6e1rbwCjnHjMzOqr1QvNEbF7ROxOOkPYMSKaI2Io8BHSbanV2j0ihkRE6Q1sJwATI2IwMDH3A+wDDM6fMYDbWzIzq7Nq7j56f0Q8XOqJiBnAB1ZhmSOA8bl7PHBAofyCSO4BekvqtwrLMTOzDqomKTwk6VxJu+XPOcBDVc4/gJskTZU0Jpf1jYjS9YkXgL65uz8wuzDtnFxmZmZ1Us0tqaOBrwDH5v7JVF+18/GImCvpXcDNkh4vDoyIkBRVRwvk5DIGYODAgR2Z1MzM2lHNLalvAmPzp0MiYm7+O1/SlcBOwIuS+kXEvFw9ND+PPhcYUJh8C1q4dhER44BxAM3NzR1KKGZm1rZWq48kXZb/PizpocpPezOWtIGkjUrdwF7ADGACy5rjHglcnbsnAIcrGQYsLlQzmZlZHbR1plCqLlrZFlH7AlemO03pCfwlIm6QdD9wmaQjgWeBQ/L415FuR51JuiV19Eou18zMVlKrSaFwlL4WMC9XI5HbQerb2nSF6Z8GPtxC+cvA8BbKAzimurDNzKwWqrn76HLg34X+d3KZmZmtYapJCj0j4u1ST+5eu3YhmZlZo1STFBZI+kypR9IIwA3imZmtgap5TuHLwMWSzsr9c4DDaxeSmZk1SjXPKTwFDJO0Ye5/reZRmZlZQ7RbfSTpZ5J6R8RrEfGapE0l+R3NZmZroGquKewTEYtKPRGxkPQ8gZmZrWGqSQo9JK1T6snPKazTxvhmZraaquZC88XAREl/zv2jgQtqF5KZmTVKNReaT5P0IPCpXPTTiLixtmGZmVkjVHOmQETcANyQG7Y7UNK1EbFfbUMzM7N6q+buo7Ul/Zeky0mv5twD+EPNIzMzs7pr9UxB0l7AoaQmr28lXUf4j4hw66VmZmuots4UbgDeS3p72hcj4h8s3zCemZmtYdq6prAj8HngfyU9DVwC9KhLVGZm1hCtnilExPSIOCEitgZOBIYAvSRdn9+TbGZma5hqHl4jIu6KiK+R3ps8FhhW06jMzKwhqkoKJRHx74i4KSKOqHYaST0kPSDpmty/laR7Jc2UdKmktXP5Orl/Zh4+qENrYmZmq6xDSWElHQs8Vug/DRgbEdsAC4Ejc/mRwMJcPjaPZ2ZmdVTTpCBpC2A/4NzcL9JzDlfkUcYDB+TuEbmfPHx4Ht/MzOqkzaSQq34eX4X5/wb4DstuZd0MWBQRS3P/HKB/7u4PzAbIwxfn8StjGiNpiqQpCxYsWIXQzMysUptJISLeAZ6QNLCjM5a0PzA/IqaubHCtxDQuIpojormpqakzZ21m1u1V0/bRpsAjku4DXi8VRsRnWp8EgF2Az0jaF1gX2Bg4A+gtqWc+G9gCmJvHnwsMAOZI6glsArzckZUxM7NVU01S+OHKzDgivgd8D0DSbsC3I+ILuQ2lg0gPw40Ers6TTMj9d+fht0RErMyyzcxs5VTTdPZtkrYEBkfE/0pan1V7svm7wCX5lZ4PAOfl8vOACyXNBF4hPU1tZmZ11G5SkHQ0MAboA2xNuiD8B2B4tQuJiEnApNz9NLBTC+O8CRxc7TzNzKzzVXNL6jGk6wNLACLiSeBdtQzKzMwao5qk8FZEvF3qyReBXddvZrYGqiYp3Cbp+8B6kvYELgf+UduwzMysEapJCicAC4CHgS8B1wE/qGVQZmbWGNXcffRvSeOBe0nVRk/4VlEzszVTNXcf7Ue62+gpQMBWkr4UEdfXOjgzM6uvah5eOx3YPSJmAkjaGrgWcFIwM1vDVHNN4dVSQsieBl6tUTxmZtZArZ4pSDowd06RdB1wGemawsHA/XWIzczM6qyt6qNPF7pfBD6ZuxcA69UsIjMza5hWk0JEjK5nIGZm1njV3H20FfA1YFBx/CqazjYzs9VMNXcfXUVqwfQfLHuDmpmZrYGqSQpvRsSZNY/EzMwarpqkcIakE4GbgLdKhRExrWZRmZlZQ1STFHYADgP2YFn1UeR+MzNbg1STFA4G3ltsPrsaktYFJgPr5OVcEREn5gvXlwCbAVOBwyLibUnrABcAQ0nvZv5cRMzqyDLNzGzVVPNE8wyg90rM+y1gj4j4MDAE2FvSMOA0YGxEbAMsBI7M4x8JLMzlY/N4ZmZWR9Ukhd7A45JulDSh9Glvokhey7298qdU7XRFLh8PHJC7R+R+8vDhklTVWpiZWaeopvroxJWduaQepCqibYDfkVpaXRQRS/Moc0jvfCb/nQ0QEUslLSZVMb1UMc8xpHdGM3DgwJUNzczMWlDN+xRuW9mZR8Q7wBBJvYErgW1Xdl6FeY4DxgE0Nzf7vQ5mZp2o3eojSa9KWpI/b0p6R9KSjiwkIhYBtwI7A73ze54BtgDm5u65wIC8zJ7AJqQLzmZmViftJoWI2CgiNo6IjUkN4X0W+H1700lqymcISFoP2BN4jJQcDsqjjQSuzt0Tcj95+C1+w5uZWX1Vc6G5LF88vgr4zypG7wfcKukhUlPbN0fENcB3geMkzSRdMzgvj38esFkuP470bmgzM6ujahrEO7DQuxbQDLzZ3nQR8RDwkRbKnwZ2aqH8TdIzEWZm1iDV3H1UfK/CUmAW6fZRMzNbw1Rz95Hfq2Bm1k209TrOH7UxXUTET2sQj5mZNVBbZwqvt1C2Aak5is0AJwUzszVMW6/jPL3ULWkj4FhgNKkxu9Nbm87MzFZfbV5TkNSHdHvoF0jtEu0YEQvrEZiZmdVfW9cUfgkcSGpSYodC43ZmZraGauvhtW8B7wF+ADxfaOri1Y42c2FmZquHtq4pdOhpZzMzW/15x29mZmVOCmZmVuakYGZmZU4KZmZW5qRgZmZlTgpmZlbmpGBmZmU1SwqSBki6VdKjkh6RdGwu7yPpZklP5r+b5nJJOlPSTEkPSdqxVrGZmVnLanmmsBT4VkRsBwwDjpG0Hek1mxMjYjAwkWWv3dwHGJw/Y4CzaxibmZm1oGZJISLmRcS03P0q8BjQn/TWtvF5tPHAAbl7BHBBfg/0PUBvSf1qFZ+Zma2oLtcUJA0iva/5XqBvRMzLg14A+ubu/sDswmRzclnlvMZImiJpyoIFC2oXtJlZN1TzpCBpQ+BvwDciYrmG9CIigOjI/CJiXEQ0R0RzU1NTJ0ZqZmY1TQqSepESwsUR8fdc/GKpWij/nZ/L5wIDCpNvkcvMzKxOann3kYDzgMci4teFQROAkbl7JHB1ofzwfBfSMGBxoZrJzMzqoM03r62iXYDDgIclTc9l3wdOBS6TdCTwLHBIHnYdsC8wE3iD9OpPMzOro5olhYi4A1Arg4e3MH4Ax9QqHjMza5+faDYzszInBTMzK3NSMDOzMicFMzMrc1IwM7MyJwUzMytzUjAzszInBTMzK3NSMDOzMicFMzMrc1IwM7MyJwUzMytzUjAzszInBTMzK3NSMDOzMicFMzMrq+XrOP8kab6kGYWyPpJulvRk/rtpLpekMyXNlPSQpB1rFZeZmbWulmcK5wN7V5SdAEyMiMHAxNwPsA8wOH/GAGfXMC4zM2tFzZJCREwGXqkoHgGMz93jgQMK5RdEcg/QW1K/WsVmZmYtq/c1hb4RMS93vwD0zd39gdmF8ebkMjMzq6OGXWiOiACio9NJGiNpiqQpCxYsqEFkZmbdV72TwoulaqH8d34unwsMKIy3RS5bQUSMi4jmiGhuamqqabBmZt1NvZPCBGBk7h4JXF0oPzzfhTQMWFyoZjIzszrpWasZS/orsBuwuaQ5wInAqcBlko4EngUOyaNfB+wLzATeAEbXKi4zM2tdzZJCRBzayqDhLYwbwDG1isXMzKrjJ5rNzKzMScHMzMqcFMzMrMxJwczMypwUzMyszEnBzMzKnBTMzKzMScHMzMqcFMzMrMxJwczMypwUzMyszEnBzMzKnBTMzKzMScHMzMqcFMzMrMxJwczMypwUzMysrEslBUl7S3pC0kxJJzQ6HjOz7qbLJAVJPYDfAfsA2wGHStqusVGZmXUvXSYpADsBMyPi6Yh4G7gEGNHgmMzMuhVFRKNjAEDSQcDeEXFU7j8M+GhEfLVivDHAmNz7fuCJuga6os2BlxocQ0c55tpb3eIFx1wvXSHmLSOiqaUBPesdyaqKiHHAuEbHUSJpSkQ0NzqOjnDMtbe6xQuOuV66esxdqfpoLjCg0L9FLjMzszrpSknhfmCwpK0krQ18HpjQ4JjMzLqVLlN9FBFLJX0VuBHoAfwpIh5pcFjV6DJVWR3gmGtvdYsXHHO9dOmYu8yFZjMza7yuVH1kZmYN5qRgZmZl3TYpSApJFxX6e0paIOmaTpr/SZK+3Unz2kzS9Px5QdLcQv/anbGMvJzdqll/SWMlfaPQf6Okcwv9p0s6ror5DJI0Y6UDroKk19oY1tp2XSTp0VrGlZc/StJZNZjvO4X1mi5pUAvjXCepdwvlnfa7bWHe/yPpEUkP5bg+2sa4oyS9pxOWOUvS5qs6n8L8ql6HDsyzZtt8ZXSZC80N8DqwvaT1IuKfwJ500VtgI+JlYAikHxDwWkT8qoEh3QkcAvxG0lqkh3E2Lgz/GPDNRgTWEa1t17wTXemDA0k9I2JpZ8S4kv4ZEUNaGiBJpGuJ+9YzIEk7A/sDO0bEW3lH3dYBzShgBvB8B5ZR0+2+EuuwWuq2ZwrZdcB+uftQ4K+lAZL6SLoqHxHcI+lDufwkSX+SNEnS05K+XpjmfyT9n6Q7SE9bl8qPlnS/pAcl/U3S+pI2kvSMpF55nI2L/e2RdH5+CrzU/1qh+/i8vIck/TiXbSDp2hzDDEmfy+V7S3pc0jTgwMI8dpJ0t6QHJN0l6f25fDKwGNg5jzqFlExflbSppHWADwAh6TZJU/OZRL88/dAcw4PAMYXljZL0d0k3SHpS0i8Kw/bKsUyTdLmkDXP5qZIezev5q1y2VR73YUknF+axoaSJeR4PSxqRy3+i5c96TgFGAz0knZOPCm+StF4ePklSc+7eXNKsQvwTJN0CTJTUT9LkfDQ5Q9In8nij82/kPmCXwnI/LenevL3/V1JfSWvlbdGUx1lLqbHIFp9EbY3SGdkTki4g7WgHqHAEXaffbT/gpYh4CyAiXoqI5yX9KC9jhqRxSg4CmoGL8/ZbryLeZkmTcvdJki6UdCdwodLZ3035ezsXUGF9rsq/x0eUWkZA0hGSflOxzmM7uA5txdbwfUWHRUS3/ACvAR8CrgDWBaYDuwHX5OG/BU7M3XsA03P3ScBdwDqkI+SXgV7AUOBhYH3SUfNM4Nt5ms0Kyz0Z+Fru/jNwQO4eA5xeRdwnAd8GzgcOKq5P/rsX6ZY3kZL+NcCuwGeBcwrjb5LXezYwOI9/WWH9NwZ65u5PAX/L3SOB3wDPAJ8EZgFfBn4K7Eva0d2dt1FTnuZzpFuMAR4Cds3dvwRm5O5RwNOFuJ4lPcy4OTAZ2CCP913gR8BmpCZOSnfQ9c5/JwCH5+5jCtulJ7Bx7t48fz8CBgHT8nY9HniKdPawFBiSx78M+GLungQ0F+YzqxD/HKBP7v8W8D+5uwewEWmn8hzQRDrCvBM4K4+zaWFdjiL/FoATgW8Uvtu/VfEbeYf0e54OXJnX8d/AsMI4s3L89frdbpjj+T/g98Anc3mfwjgXAp+u3M7FeHN3MzCp8P8wFVgv958J/Ch37wdEYbrSd7MeKTluluN6CuiVh90F7NDBdWgrtobtK1b2052rj4iIh5SqCg4lnTUUfZy0IyUibslHIKUqkmsjHS28JWk+0Bf4BHBlRLwBIKn44N32+ai1N+mHdWMuPxf4DnAV6ej06E5Yrb3y54HcvyFpp387cLqk00g7/tslDQGeiYgnc8wXsaxdqU2A8ZIGk/6xSkcllwM/JO34jwNezN39SdVGi0lnDnsBN0uCtFOcp1SH3TsiJud5XUhqFbdkYkQszrE8CmxJ2mbbAXfmea2dl7cYeBM4T+k6SKm6Zxfy95bnf1ruFvAzSbuSdpD9gb4RMUvSy8C7c5wPAIvydpmep51K2rG25+aIeCV33w/8KR/NXRUR0yUNJ+0wFuR1vBR4Xx5/C+BSpTOqtUlJF+BPwNWkRHwEaefQnuWqj/Jv/NmIuKeFcevyu42I1yQNzcvbnbSuJ5DOML9D2kH2AR4B/lHFOhZNiFQFDOkA6MC8zGslLSyM93VJ/5W7BwCDI+KefHa3v6THSMnh4Q6uQ1u68r6iRd06KWQTgF+RzhI2q3Katwrd79D+djyflOUflDQqL4uIuDOf2u8G9IiIjlx0XUqu/lOq1y/VbQr4eUT8sXICSTuSjuZPljSRtp8Y/ylwa0T8V96pTMoxvyHpZtI670c6SppBOuP4FrAkj9s/InYuzlAtXNis0NJ2FWlne2gL67MTMBw4CPgq6YwOUhKr9AXSEfrQiPiXUrXPunnYuaRrIOsC328llvVyd3m7F6Yveb3UERGTcwLaDzhf0q9J26Y1vwV+HRET8u/hpDyf2ZJelLQHqSXhL7Qxj7a83v4oKzifTvzdRsQ7pN/GJEkPA18ina035/U8iRW3aUlV2701OdZPATvn3/Aklv/+vw88TjtJt4V1GNlObF1hX9Eh3f2aAqQjsR+3cHRwO/kfMH8RL0VEW//Uk4EDcv3nRsCnC8M2Ih0p92LFf+oLgL9Q3RFg0SzSaSjAZ1h2JH8jcISW1bv3l/QupTs53oiIi0jVNjuS/gkGSdo6T1vc8W7CsgvvoyqWfS6pWfMewIKIeCcfIfcmXWv4K9CkdGEOSb0kfTAiFgGLJH08z6eaHdw9wC6Stsnz2kDS+/L6bRIR15F26B/O499JaiKlcv6bAPNzQtiddBZSciWwDeno8UbaNotl2/2g1kaStCXwYkScQ9peOwL3Ap/MZ529gIMr4itt75EVszsXuAi4PO+UOlNdfreS3p/POkuGsKyF45fy91ncnq/m5ZfMYtl2/yytmwz8d17mPqRqOUjbd2FOCNsCw0oTRMS9pO/+vylcV6xyHZ7tQGzFGOu5r+iQbp8UImJORJzZwqCTgKGSHgJOZcV/1Mr5TAMuBR4EridVH5T8kLRDuJO0Iy66mPTDbfXH2IpzSDuYB0k74tdzHDeRfjh35yOZK0g/tB2A+yRNJ9VTnxwRb5Kqi65VutA8vzD/XwA/l/QAFUc3ETEVeIV0FF+skngYWBwR80n/4Kfl+KaTqpYgnfr+Lsch2pGrWkYBf83fxd3Atnmdrslld5CqsgCOBY7J696/MKuLgeZcfjiF7yHS+ztmAQ9WsdP9FfCVvF3autVxN+DBPN7ngDMiYh7pd3U36bfwWGH8k4DLJU1lxWaVJ5CqEjp9Z1DH3+2GpOrIR/N3th1pnc8hnWneWLHs84E/KF9oBn4MnCFpCumIuzU/BnaV9AipGum5XH4D0DNXEZ3K8r9bSNeN7oyIhbSutXWoNjagIfuKDnEzFw2mdKfFiIg4rNGxVCufdUwCto2Ifzc4nFWWq9+mAQeXrq90JUp3O42NiE80OpaS1fF325Z8XWpsRExsdCytqdc29zWFBpL0W9KF1rreM74qJB0OnAIct4YkhO1IF6mv7KIJ4QTgK6z8tYROtzr+bluTr3PdRzpL7MoJoW7b3GcKZmZW1u2vKZiZ2TJOCmZmVuakYGZmZU4K1q2pk1p8rZjncu1StTLObuqkFnnNOpOTgnV3d5KfodCyFl8/WBj+MVL7NWbdgpOCdXd3sazF1w+SHqSqtsXXrZVadZ0q6fb8pOxyJP00nzn00Eq0SKvUPlVpvDskfbhyGWadyUnBurWIeB5YKmkg6azgbtITpTuTWrx8DBhLapF2KKlZlFPy5ONIrVgOJbVc+/vivCX9ktTe0mhSMyTnkJo0GEpqgK/kceATEfERUguwP8vl55GbGJH0PmDdiHiws9bdrCV+eM0snS18LH9+TXUtvm6Yx7k8l0NqIrnkh8C9EVFqt39bVrJFWknHk1pIPb9T19qsBU4KZsuuK+xA9S2+bgwsilbecEZqz2aopD6F5rRb016LtCNIb7ob2uoczDqJq4/M0pnC/sArHWjxdQnwjKSDc7kq6vtvIDW8dm1uCXNVWqQ9E7i/ncbazDqFk4JZat11czre4usXgCNz+SOkI/qyiLicdB1hAqlF2JVtkXYJNW4u2azEbR+ZdWFrWou01vX5TMGsi8ot0t5LetezE4LVhc8UzMyszGcKZmZW5qRgZmZlTgpmZlbmpGBmZmVOCmZmVvb/ATRne5ydkq2NAAAAAElFTkSuQmCC\n",
+      "text/plain": [
+       "<Figure size 432x288 with 1 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    },
+    {
+     "data": {
+      "text/plain": [
+       "'\\nOn what areas would you recommend the planning team focus their brainstorming efforts to reduce major incidents?\\n'"
+      ]
+     },
+     "execution_count": 161,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "'''\n",
+    "What time of day and day of the week do most major incidents happen?\n",
+    "Are there any patterns in the time of day/ day of the week when major incidents occur?\n",
+    "What characteristics stand out in major incidents compared with other accidents?\n",
+    "'''\n",
+    "import pandas as pd\n",
+    "import numpy as np\n",
+    "import datetime\n",
+    "import matplotlib.pyplot as plt\n",
+    "\n",
+    "accidents = pd.read_csv(r'./data/accident-data.csv')\n",
+    "aDF = pd.DataFrame(accidents).dropna() #there was no empty data\n",
+    "#print(df.columns)\n",
+    "\n",
+    "#DATE TIME DATAFRAME:\n",
+    "timeDF=aDF.filter([\"accident_index\", \"number_of_casualties\", \"date\", \"day_of_week\", \"time\"])\n",
+    "timeDF=timeDF[timeDF['number_of_casualties']>2].reset_index(drop=True)\n",
+    "\n",
+    "nums=[]\n",
+    "weekday=[\"Monday\", \"Tuesday\", \"Wednesday\", \"Thursday\", \"Friday\", \"Saturday\", \"Sunday\"]\n",
+    "print(\"Calculating accident count day of week: \")\n",
+    "for i in range(1, 8):\n",
+    "    day = timeDF[timeDF['day_of_week'] == i]\n",
+    "    count=day['day_of_week'].count()\n",
+    "    nums.append(count)\n",
+    "    #print(count, \" on \", weekday[i-1]) \n",
+    "#print(\"Done counting accident count in day of week.\")\n",
+    "\n",
+    "#First plot:\n",
+    "plt.bar(weekday, nums)\n",
+    "plt.xlabel('Weekday')\n",
+    "plt.ylabel('Number Accidents')\n",
+    "plt.title('Number Accidents per Weekday')\n",
+    "plt.show()\n",
+    "\n",
+    "'''\n",
+    "Calculating accident count day of week: \n",
+    "687  on  Monday\n",
+    "614  on  Tuesday\n",
+    "621  on  Wednesday\n",
+    "632  on  Thursday\n",
+    "645  on  Friday\n",
+    "798  on  Saturday\n",
+    "820  on  Sunday\n",
+    "Done counting accident count in day of week.\n",
+    "'''\n",
+    "\n",
+    "'''\n",
+    "On what areas would you recommend the planning team focus their brainstorming efforts to reduce major incidents?\n",
+    "'''\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "392721f3-bc55-4bc1-9e7d-c6b1dd5f3be6",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{0: 94, 1: 73, 2: 54, 3: 48, 4: 33, 5: 41, 6: 65, 7: 110, 8: 197, 9: 149, 10: 211, 11: 242, 12: 272, 13: 312, 14: 372, 15: 401, 16: 433, 17: 374, 18: 341, 19: 286, 20: 232, 21: 159, 22: 181, 23: 137}\n"
+     ]
+    },
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 432x288 with 1 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    },
+    {
+     "data": {
+      "text/plain": [
+       "'\\nThe graph shows that most accidents happen between hours 14 and 18. \\nThis would be between 2 and 6pm.\\nThe most accidents happen at 4pm around when most people get off work so it is not surprising.\\n'"
+      ]
+     },
+     "execution_count": 162,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "'''\n",
+    "What time do most accidents happen?\n",
+    "'''\n",
+    "from datetime import datetime\n",
+    "\n",
+    "hours=list(timeDF['time'].astype(str).str[:2])\n",
+    "hoursDic={} #store into dictionary with hours by key and number accidents as values\n",
+    "\n",
+    "for i in range(0,10):\n",
+    "    count=hours.count('0'+str(i))\n",
+    "    hoursDic[i]=count\n",
+    "for i in range(10,24):\n",
+    "    count=hours.count(str(i))\n",
+    "    hoursDic[i]=count\n",
+    "    \n",
+    "print(hoursDic)\n",
+    "\n",
+    "plt.bar(hoursDic.keys(),hoursDic.values())\n",
+    "plt.title('Accidents on an Hourly Basis')\n",
+    "plt.xlabel('Time of Accident by Hour')\n",
+    "plt.ylabel('Number Accidents')\n",
+    "plt.show()\n",
+    "\n",
+    "'''\n",
+    "The graph shows that most accidents happen between hours 14 and 18. \n",
+    "This would be between 2 and 6pm.\n",
+    "The most accidents happen at 4pm around when most people get off work so it is not surprising.\n",
+    "'''\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 31,
+   "id": "be13e6d2-9311-4b88-9028-78dcc69e6154",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Top ten most dangerous locations: \n",
+      "Lat    Long   Count \n",
+      "-0.165   1.52    91\n",
+      "-0.135   1.43    75\n",
+      "-0.151   .5    74\n",
+      "-0.175   1.52    71\n",
+      "-0.135   1.51    70\n",
+      "-0.145   1.54    70\n",
+      "-0.065   1.51    65\n",
+      "-0.075   1.52    64\n",
+      "-0.145   1.52    64\n",
+      "-0.075   1.58    62\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "'\\nTop ten most dangerous locations: \\nLat    Long   Count \\n-0.165   1.52    91\\n-0.135   1.43    75\\n-0.151   .5    74\\n-0.175   1.52    71\\n-0.135   1.51    70\\n-0.145   1.54    70\\n-0.065   1.51    65\\n-0.075   1.52    64\\n-0.145   1.52    64\\n-0.075   1.58    62\\n'"
+      ]
+     },
+     "execution_count": 163,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "'''\n",
+    "#LocDF will locate the most common places for accidents using longitude and latitude.\n",
+    "'''\n",
+    "\n",
+    "locDF=aDF.filter(['longitude', 'latitude']).round(2)\n",
+    "locDF = locDF.applymap(str) #need to combine two numbers in next step\n",
+    "locDF['Loc']=locDF['longitude']+ locDF['latitude'] #combines two dataframes as str. Now, count to see if same number populates.\n",
+    "loc=sorted(list(locDF['Loc']))\n",
+    "\n",
+    "from collections import Counter\n",
+    "count=Counter(loc) #counts how many in a given list\n",
+    "topTen=count.most_common(10) #only need the top ones\n",
+    "\n",
+    "print(\"Top ten most dangerous locations: \")\n",
+    "print(\"Lat  \" , \" Long \", \" Count \")\n",
+    "for t in topTen:\n",
+    "    lat=t[0][:6]\n",
+    "    long=t[0][6:]\n",
+    "    count=t[1]\n",
+    "    print(lat, \" \", long, \"  \", count)\n",
+    "    \n",
+    "'''\n",
+    "Top ten most dangerous locations: \n",
+    "Lat    Long   Count \n",
+    "-0.165   1.52    91\n",
+    "-0.135   1.43    75\n",
+    "-0.151   .5    74\n",
+    "-0.175   1.52    71\n",
+    "-0.135   1.51    70\n",
+    "-0.145   1.54    70\n",
+    "-0.065   1.51    65\n",
+    "-0.075   1.52    64\n",
+    "-0.145   1.52    64\n",
+    "-0.075   1.58    62\n",
+    "'''\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "40fd7dcb-b77b-4c4d-8f06-1365225e7496",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Here are the top ten accident types: \n",
+      "                                         table\n",
+      "field name                                    \n",
+      "junction_detail                             11\n",
+      "weather_conditions                          10\n",
+      "carriageway_hazards                         10\n",
+      "special_conditions_at_site                  10\n",
+      "road_surface_conditions                      9\n",
+      "road_type                                    8\n",
+      "pedestrian_crossing_physical_facilities      8\n",
+      "day_of_week                                  7\n",
+      "junction_control                             7\n",
+      "second_road_class                            7\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "'\\nfield name                       \\njunction_detail                11\\nweather_conditions             10\\ncarriageway_hazards            10\\nspecial_conditions_at_site     10\\nroad_surface_conditions         9\\n'"
+      ]
+     },
+     "execution_count": 164,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "ldata = pd.read_csv(r'./data/road-safety-lookups.csv')\n",
+    "#print(lDF.head()) # table field name code/format label\n",
+    "\n",
+    "# Total missing values for each feature\n",
+    "def checkNA():\n",
+    "\tlDF.isnull().sum() \n",
+    "'''\n",
+    "table            0\n",
+    "field name       0\n",
+    "code/format      8\n",
+    "label           10\n",
+    "note           119\n",
+    "'''\n",
+    "\n",
+    "print(\"Here are the top ten accident types: \")\n",
+    "lDF = pd.DataFrame(data=ldata, columns=['table', 'field name'])\n",
+    "lcount=lDF.groupby(by=['field name']).count().sort_values(by='table', ascending=False).head(10)\n",
+    "print(lcount)\n",
+    "'''\n",
+    "Here are the top ten accident types: \n",
+    "                                         table\n",
+    "field name                                    \n",
+    "junction_detail                             11\n",
+    "weather_conditions                          10\n",
+    "carriageway_hazards                         10\n",
+    "special_conditions_at_site                  10\n",
+    "road_surface_conditions                      9\n",
+    "road_type                                    8\n",
+    "pedestrian_crossing_physical_facilities      8\n",
+    "day_of_week                                  7\n",
+    "junction_control                             7\n",
+    "second_road_class                            7\n",
+    "'''"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "recent-boards",
+   "metadata": {
+    "id": "Rm2MvBfC9mYK",
+    "tags": []
+   },
+   "source": [
+    "## 💪 Competition challenge\n",
+    "\n",
+    "Create a report that covers the following:\n",
+    "\n",
+    "1. What time of day and day of the week do most major incidents happen?\n",
+    "2. Are there any patterns in the time of day/ day of the week when major incidents occur?\n",
+    "3. What characteristics stand out in major incidents compared with other accidents?\n",
+    "4. On what areas would you recommend the planning team focus their brainstorming efforts to reduce major incidents?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "young-evaluation",
+   "metadata": {
+    "id": "6zXWKexuHxE9"
+   },
+   "source": [
+    "## 🧑‍⚖️ Judging criteria\n",
+    "\n",
+    "| CATEGORY | WEIGHTING | DETAILS                                                              |\n",
+    "|:---------|:----------|:---------------------------------------------------------------------|\n",
+    "| **Recommendations** | 35%       | <ul><li>Clarity of recommendations - how clear and well presented the recommendation is.</li><li>Quality of recommendations - are appropriate analytical techniques used & are the conclusions valid?</li><li>Number of relevant insights found for the target audience.</li></ul>       |\n",
+    "| **Storytelling**  | 30%       | <ul><li>How well the data and insights are connected to the recommendation.</li><li>How the narrative and whole report connects together.</li><li>Balancing making the report in depth enough but also concise.</li></ul> |\n",
+    "| **Visualizations** | 25% | <ul><li>Appropriateness of visualization used.</li><li>Clarity of insight from visualization.</li></ul> |\n",
+    "| **Votes** | 10% | <ul><li>Up voting - most upvoted entries get the most points.</li></ul> |"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f0e743f6-4df4-4311-b0d6-7bfafbee8d89",
+   "metadata": {},
+   "source": [
+    "## ✅ Checklist before publishing into the competition\n",
+    "- Rename your workspace to make it descriptive of your work. N.B. you should leave the notebook name as notebook.ipynb.\n",
+    "- Remove redundant cells like the judging criteria so the workbook is focused on your story.\n",
+    "- Make sure the workbook reads well and explains how you found your insights.\n",
+    "- Check that all the cells run without error."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "9b658ba9-df9f-4821-aa4c-674007cf3d25",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "colab": {
+   "name": "Welcome to DataCamp Workspaces.ipynb",
+   "provenance": []
+  },
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.10"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
